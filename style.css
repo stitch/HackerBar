@@ -1,0 +1,427 @@
+body
+{
+    color:#ffffff;
+    cursor:default;
+    background-color:#E5E9EC;
+
+    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; /* dyslectic font here.. */
+    font-size:14px;
+    font-style:normal;
+    font-weight:700;
+
+    box-sizing:border-box;
+
+    overflow-x: hidden; /** no scrollbar on the body, manage your own scrollbars */
+
+    /*position:relative; /*make the total display-width smaller*/
+    /*width:1214px;*/
+    margin:0;
+
+    -webkit-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+/** page layout */
+#headerTopContainer {
+    height: 65px;
+    z-index: 9001;
+    border-bottom: 1px solid black;
+    background-color:#E5E9EC;
+    position: fixed;
+    width: 100%;
+}
+
+.Container1Top{
+    display: table;
+    top:0px;
+    position: absolute;
+    width: 100%; /** Zonder left... */
+}
+
+.Container1{
+    display: table;
+    top:65px;
+    position: absolute;
+    width: 100%; /** Zonder left... */
+    height: calc(100% - 65px);
+}
+
+.Left
+{
+    display: table-cell;
+    left:0;
+    bottom:0;
+    max-width:210px; /*1*/
+    vertical-align: top;
+}
+
+
+.Middle
+{
+    display: table-cell;
+    vertical-align: top;
+    width: 100%;
+    padding-left: 20px;
+}
+
+.Right
+{
+    right:0;
+    bottom:0;
+    /*width:345px;*/
+    margin-left: 5px;
+    display: table-cell;
+    max-width: 365px; /* grootte die je krigjt als er iets in komt testaan, maar is niet max, want als middle leeg is, rekt het alsnog uit. */
+}
+
+
+
+
+
+.CommandHolder{
+
+}
+
+.Command
+{
+    /**
+    * de grote onderscheidende factor van knopjes is de kleur / achtergrond, de rest is eigenlijk overal hetzelfde */
+    background-color:green; /**D99000*/
+
+    color:#FFF;
+    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;
+    cursor:pointer; /**handje*/
+    text-align:center;
+
+    margin:5px 5px 0 0;
+    padding:9px 12px;
+    border-radius:3px;
+    height:84px;
+    width:120px;
+
+    box-sizing:border-box; /**autolayouting?*/
+    display:inline-block; /**next to eachother*/
+    align-items:flex-start;
+    position:relative;
+    vertical-align:middle;
+}
+
+#command_back, #close
+{
+    background-color:#B90000
+}
+
+.disablebutton
+{
+    cursor:auto;
+    background-color:#AAA
+}
+
+/**
+ * todo: style suggestions... this has been tested but it looks horrible.
+*/
+
+/**http://jsfiddle.net/aP2Ju/*/
+/**todo: the input still sucks and is a world of shit of it's own. */
+.inputholder{
+    width: 100%;
+    display: inline-block;
+}
+
+#input
+{
+    background-color:#F7F7F7;
+    border:1px solid black;
+    border-radius:3px;
+    color:#222;
+    font-size:22px;
+    font-weight:400;
+    letter-spacing:0;
+    margin:5px;
+    outline: medium none;
+    padding:13px 20px 12px 20px;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    width: calc(100% - 380px); /*  quick fix. */
+}
+
+.FinalCommand
+{
+    text-align: center;
+    margin: 5px;
+    padding: 10px;
+    margin-bottom: 13px;
+    width:345px;
+    font-size:22px;
+    border-radius: 10px;
+    height:30px;
+    background-color: deepskyblue;
+
+    right: 0px;
+    top: 0px;
+    position: fixed;
+}
+
+.EternalAbort
+{
+    text-align: center;
+    margin: 5px;
+    padding: 10px;
+    margin-bottom: 8px;
+    width:172px;
+    font-size:22px;
+    border-radius: 10px;
+    height:30px;
+    float: left;
+    background-color: #B900B9;
+}
+
+
+
+#Accounts
+{
+    height:100%;
+    width: 108%;
+    overflow-y:auto;
+    overflow-x:hidden;
+}
+
+.Account
+{
+    text-align: center;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    padding: 10px;
+    font-size:22px;
+    border-radius: 10px;
+    height:20px;
+    background-color: darkgreen;
+    width: 172px;
+    display: inline-block;
+}
+
+.InvolvedAccount
+{
+    text-align: center;
+    margin: 5px;
+    padding: 10px;
+    width: 345px;
+    font-size:22px;
+    border-radius: 10px;
+    height:28px;
+    background-color: darkgreen;
+
+}
+
+
+
+
+
+/**Shop*/
+.CommandLabelLeft
+{
+    background-color:darkblue;
+    border-radius:5px;
+    height:25px;
+    left:0;
+    position:absolute;
+    top:72px;
+    width:65px
+}
+
+.CommandLabelRight
+{
+    background-color:darkmagenta;
+    border-radius:5px;
+    font-weight:400;
+    height:25px;
+    right:0px;
+    position:absolute;
+    top:72px;
+    width:50px
+}
+
+.Totalamount
+{
+    outline:medium none;
+    width:120px;
+    position:relative;
+    left:185px;
+    text-align:right
+}
+
+/**todo: add productlines*/
+/**end shop*/
+
+#header{
+    position: fixed;
+}
+
+
+#defaultIframe {
+    z-index: 10000;
+    background-color: transparent;
+    color: darkgray;
+    position: relative;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0 auto;
+    width: 80%;
+    height: 80%;
+    overflow: hidden;
+    padding: 0;
+    border: 0 solid transparent;
+}
+
+#Pages {
+    background-color: transparent;
+    color: black;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .printable, .printable * {
+        visibility: visible;
+    }
+    .printable {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+}
+
+#Products{
+    margin: 5px;
+    padding: 5px;
+
+    color: black;
+}
+
+.ui-autocomplete {
+    background-color: rgba(255,255,255,0.8);;
+    border: 1px solid black;
+    color: black;
+    list-style:  none;
+    font-size: 32px;
+    width: 300px;
+
+}
+
+/**todo: in firefox there is still something rendering... */
+.ui-helper-hidden-accessible {
+
+    display: none;
+}
+
+.value {
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid black;
+    background-color: yellowgreen;
+    color: black;
+    border-radius: 5px;
+    width: 345px;
+}
+
+.productline{
+    border-bottom: 1px solid silver;
+}
+
+.productline .removeone{
+    float: right;
+}
+
+.productline .removeall{
+    float: right;
+}
+
+.productline .addone{
+    float: right;
+}
+
+.productline .name{
+    width: 120px;
+    overflow: hidden;
+    display: inline-block;
+    margin: 0px;
+    padding: 0px;
+}
+
+#BackgroundHtml{
+    height: 280px;
+
+    padding: 5px;
+}
+
+#BackgroundHtml iframe{
+    border: 0px;
+    width: 320px;
+}
+
+
+h3 {
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid black;
+    background-color: yellowgreen;
+    color: black;
+    border-radius: 5px;
+}
+
+/*just uses space*/
+.ui-columns-search {
+    visibility: hidden;
+    height: 0px;
+}
+
+.table-of-contents{
+    width: 335px;
+    wrap-option: auto;
+    border-radius: 10px;
+    background-color: white;
+    color: black;
+    padding: 5px;
+    padding-left: 15px;
+}
+
+.close {
+    color: black;
+}
+/*
+productline'>" +
+"                       <span class='name' title='" + value.description + "'>" + value.name + "</span>" +
+"                       <span class='amount'>" + value.amount + "</span>" +
+"                       <span class='individualPrice'>" + value.individualPrice + "</span>" +
+"                       <span class='accumulatedPrice'>" + value.accumulatedPrice + "</span>" +
+"                       <span class='addone' command='addone " + value.name + "'>[+]</span>" +
+"                       <span class='removeone' command='removeone " + value.name + "'>[-]</span>" +
+"                       <span class='removeall'
+*/
+/**
+Deprecated, used as copypaste resource
+
+
+.Log
+{
+    background-color:#fff;
+    clear:both;
+    height:160px;
+    overflow:scroll;
+    position:relative;
+    top:240px;
+    width:339px
+}
+
+.Numpad
+{
+    width:320px;
+    clear:both;
+    position:absolute
+}
+
+*/

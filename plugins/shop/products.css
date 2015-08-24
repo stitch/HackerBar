@@ -1,0 +1,30 @@
+#command_snickers {  background-image: url('images/snickers.jpg');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_kitkat {  background-image: url('images/kitkat.jpg');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_bounty {  background-image: url('images/bounty.jpg');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_lion {  background-image: url('images/lion.jpg');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_mars {  background-image: url('images/mars.png');  background-size: contain;  background-position: left;  color: transparent; background-color: black;  background-repeat: no-repeat;}
+#command_oreo {  background-image: url('images/oreo.jpg');  background-size: contain;  background-position: left;  color: transparent; background-color: white; background-repeat: no-repeat; }
+#command_twix {  background-image: url('images/twix.jpg');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_rozekoekenkhuizer {  background-image: url('images/rozekoek.png');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_kanjerstroopwafels2st {  background-image: url('images/kanjers.png');  background-size: contain;  background-position: left;  background-color: saddlebrown;  background-repeat: no-repeat;  }
+#command_aadrinkhighenergy33cl {  background-image: url('images/aadrink.png');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_cocacola33cl {  background-image: url('images/cocacola.jpg');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_clubmate50cl {  background-image: url('images/clubmate.png');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_sparood33cl {  background-image: url('images/sparood.gif');  background-size: cover;  background-position: left;  color: transparent;  }
+#command_fantacassis33cl {  background-image: url('images/fantacassis.png');  background-size: cover;  background-position: left;  color: transparent;  }
+
+#command_snickers span {  color: white;  }
+#command_kitkat span {  color: white;  }
+#command_bounty span {  color: white;  }
+#command_lion span {  color: white;  }
+#command_mars span {  color: white;  }
+#command_oreo span {  color: white;  }
+#command_twix span {  color: white;  }
+#command_rozekoekenkhuizer span {  color: white;  }
+#command_kanjerstroopwafels2st span {  color: white;  }
+#command_aadrinkhighenergy33cl span {  color: white;  }
+#command_cocacola33cl span {  color: white;  }
+#command_clubmate50cl span {  color: white;  }
+#command_sparood33cl span {  color: white;  }
+#command_fantacassis33cl span {  color: white;  }
+

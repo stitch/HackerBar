@@ -1,0 +1,3 @@
+Header Set Access-Control-Allow-Origin: "*"
+Header Set Cache-Control: no-cache
+

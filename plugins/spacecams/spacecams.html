@@ -1,0 +1,702 @@
+<!--
+ DN3D camera viewer. Inspired by the game Duke Nukem 3D and a shitload of webcams on Hackerspace Hack42.
+ Check out http://hack42.nl and http://elgerjonker.nl 
+ 
+ By Elger Jonker, elgerjonker.nl.
+ (C) Creative Commons non-commercial share-alike with this orignal notice attached.
+-->
+<!-- 
+ Add cams to the list below (motionjpeg). These are then displayed using a graphical interface
+ that is similar to the one used in Duke Nukem 3D, including audio.
+
+ Controls are:
+ H -> Help
+ C -> List of camera's. Clicking = Goto
+ D -> Debug screen 
+ 0-9 -> Show camera's 0 to 9, in order of your configuration.
+ 
+ Todo nonsense lolz features:
+ - doesn't do graphical distortions. (cams are distorted by themselves, but not enough)
+ - blinking red light
+ - arrow keys (37 and 39) where not available for testing, thus not implemented.
+  - - for now keys 44 and 46 are used, which are , and . on this keyboard. (with the symbols < and >)
+ 
+ Help:
+ If a cam doesn't show up, but it did, it might be one of the motion-detection cameras.
+ Also notice that every type of cam has its own URL, although they are all axis cams.
+ 
+ When switching from loop to manual, the same room is shown. When switching from manual
+ to moving, the next room is shown. This behaviour is intentional. You want to see the 
+ whole room if something is wrong, when things look good, you want to get to the next one.
+ 
+ The "writeToAllCams" routine might eat some serious data, since it munches all available
+ streams at the same time. There might be performance improvements needed, or be disabled
+ on slow machines.
+    todo: http://wilco.baanhofman.nl/station/spaces.html
+-->
+
+<html>
+    <head>
+        <title>DN3D Security Monitoring System V1.0</title>
+        <script language="javascript">
+
+            /**
+                Cams fetched from spaceApi, just fill the cams array with your cams otherwise.
+            */
+            var cams = Array();
+            getCamsFromSpaceAPI();
+
+            var camSwitchSound = new Audio("dn3dcamswitchsound.mp3");
+            var securityOverlayPicture = "security.png";
+
+            function getCamsFromSpaceAPI()
+            {
+                var request = new XMLHttpRequest();
+                request.onreadystatechange = parseSpace;
+                request.open("GET", "http://spaceapi.net/directory.json?filter=cam", true);
+                request.send(null);
+            }
+
+        function parseSpace()
+        {
+	        if (this.readyState != 4 || this.status != 200) {
+		         return false;
+	        }
+	        var directory = JSON.parse(this.responseText);
+	        for (var space in directory) {
+		         var request = new XMLHttpRequest();
+		         request.onreadystatechange = parseState;
+	                 request.open("GET", directory[space], true);
+        	         request.send(null);
+                }
+        }
+
+        function parseState()
+        {
+                if (this.readyState != 4 || this.status != 200) {
+                        return false;
+                }
+
+                var spaceObject = JSON.parse(this.responseText);
+                if (!spaceObject || !(("stream" in spaceObject) || ("cam" in spaceObject)))
+	                return;
+
+		// todo: check for type, or  some url that works...
+                for (var format in spaceObject["stream"]){
+                        if (spaceObject["stream"][format].length > 2) {
+                                var ssf = spaceObject["stream"][format];
+                                if (cams.indexOf(ssf) == -1 
+				    && ssf.length > 2 
+				    && typeof(ssf) == "string"
+                                    && (ssf.indexOf(".jpg") !== -1 || ssf.indexOf(".mjpg") !== -1)) {
+                                        cams.push(spaceObject["stream"][format]);
+                                }
+                        } else {
+                                // it's a single string and not an array as specified in the api...
+				var ss = spaceObject["stream"];
+                                if (cams.indexOf(ss) == -1 
+				    && ss.length > 2 
+				    && typeof(ss) == "string"
+				    && (ss.indexOf(".jpg") !== -1) || ss.indexOf(".mjpg") !== -1) {
+                                        cams.push(spaceObject["stream"]);
+                                }
+                        }
+                }
+
+                // there is some symptom that adds just characters of the url, not the entire url. because it's not always an array. mitigating this with length checks.
+                for (var format in spaceObject["cam"]){
+                        //alert(spaceObject["cam"][format] + " " + spaceObject["cam"][format].length + " " + format + " " + spaceObject["cam"]);
+                        if (spaceObject["cam"][format].length > 2) {
+				var scf = spaceObject["cam"][format];
+				if (cams.indexOf(scf) == -1 
+				    && scf.length > 2 
+				    && typeof(scf) == "string"
+				    && (scf.indexOf(".jpg") !== -1 || scf.indexOf(".gif") !== -1 || scf.indexOf(".png") !== -1)) {
+					cams.push(spaceObject["cam"][format]);
+				}
+                        } else {
+				var sc = spaceObject["cam"];
+				if (cams.indexOf(sc) == -1 
+				    && sc.length > 2 
+				    && typeof(sc) == "string"
+				    && (sc.indexOf(".jpg") !== -1 || sc.indexOf(".gif") !== -1 || sc.indexOf(".png") !== -1)) {
+					cams.push(spaceObject["cam"]);
+				}
+                        }
+                }
+        }
+
+
+	   /*
+                You don't need to edit anything below this line.
+                ---------------------------------------------------------------
+            */
+
+            var currentCam = 0; // the cam displayed NOW. (you have to adhere to it by code)
+            var applicationModus = "loop"; // two states: loop and manual. Use getters and setters.
+
+            /** noise globals  */
+            var canvas_ctx;
+            var noise_alpha;
+            var imageData;
+            var pixels;
+
+            // public, one time
+            function startCamApplication()
+            {
+               currentCam = -1;
+               setApplicationModus("loop");
+
+               setTimeout(switchCam, 750);
+               setTimeout(writeAllCamsToAllCams, 1000); // fast load
+               setTimeout(writeAllCamsToAllCams, 10000); // slow load, more cams
+               setTimeout(writeAllCamsToAllCams, 30000); // uber slow load, yes they exist
+               setInterval(writeAllCamsToAllCams, 300000); // and every 5 minutes
+
+               setInterval(reloadImage, 1000); // reload the displayed image every second.
+
+               securityOverlay = document.getElementById("imagesource");
+               securityOverlay.src = securityOverlayPicture;
+               showHide("help"); // show help on first load
+
+               createNoiseCanvas(.30);
+            }
+
+	function noiseLoop() {
+
+		// Pick the best array length
+		var rl = Math.round(window.innerWidth * 3.73);
+		var randoms = new Array(rl);
+
+		// Pre-calculate random pixels
+		for (var i = 0; i < rl; i++) {
+			randoms[i] = Math.random();
+		}
+
+		// Apply random pixels
+		for (var i = 0, il = pixels.length; i < il; i += 4) {
+		      pixels[i] =  (127 * randoms[i % rl]) & 0xff;
+		      pixels[i + 1] =  (127 * randoms[i % rl]) & 0xff;
+		      pixels[i + 2] =  (127 * randoms[i % rl]) & 0xff;
+	              pixels[i + 3] = noise_alpha;
+		}
+
+		canvas_ctx.putImageData(imageData, 0, 0);
+		window.setTimeout('noiseLoop()', 100);
+	}
+
+	function createNoiseCanvas(alpha) {
+		var canvas = document.getElementById('noise');
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+		canvas.style.position = 'fixed';
+		canvas.style.top = '0px';
+		canvas.style.left = '0px';
+		canvas_ctx = canvas.getContext('2d');
+
+		canvas_ctx.createImageData(canvas.width, canvas.height);
+		noise_alpha = alpha * 255;
+		
+		imageData = canvas_ctx.getImageData(0, 0, window.innerWidth, window.innerHeight);
+		pixels = imageData.data;
+
+		noiseLoop();
+	}
+
+            // private
+            function playSwitchSound()
+            {
+                camSwitchSound.play();
+            }
+            
+        
+            // all keyboard input handling
+            // public, one time
+            // http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+            function handleKeyboardInput(e)
+            {
+                //alert(e.keyCode);
+            
+                // on space, like in duke, cam is switched
+                if(e.keyCode == 32)
+                {    
+                    // first get out of the loop and show the whole image
+                    // this is in order to show the current camera full-sized.
+                    if (getApplicationModus() == "loop")
+                    {
+                        setApplicationModus("manual");
+                    } 
+                    else 
+                    {
+                        // we're already in manual.
+                        playSwitchSound();
+                        switchCam();
+                    }
+                }  
+                
+                // showhide help (h key)
+                if (e.keyCode == 104)
+                {
+                    showHide("help");
+                }
+                
+                // showhide debug info (d key)
+                if (e.keyCode == 100)
+                {
+                    showHide("debug");
+                }
+                
+                // showhide debug info (c key)
+                if (e.keyCode == 99)
+                {
+                    writeAllCamsToAllCams(); // inefficient
+                    showHide("allcams");
+                }
+                
+                if (e.keyCode == 44)
+                {
+                    showPreviousCam();
+                }
+                
+                if (e.keyCode == 46)
+                {
+                    showNextCam();
+                }
+                
+                // keys 0-9 go to a cam directly. Order depending on configuration.
+                if (e.keyCode >= 48 && e.keyCode <= 57)
+                {
+                    showCamDirectly(e.keyCode);
+                }              
+                
+                //alert(getApplicationModus());
+                
+                // on enter the cam is let-loose into autoswitch modus
+                if (    e.keyCode != 32 && 
+                        e.keyCode != 104 && 
+                        e.keyCode != 100 && 
+                        e.keyCode != 99 && 
+                        e.keyCode != 44 && 
+                        e.keyCode != 46 && 
+                        (e.keyCode < 48 || e.keyCode > 57) &&
+                        getApplicationModus() != "loop"
+                    )
+                {
+                    setApplicationModus("loop");
+                } 
+                else 
+                {
+                    //return; // ignore the input
+                }
+            }
+            
+                        
+            // switch between application modus, requires zoom out and looping disabled.
+            // or enable those functions again. 
+            function setApplicationModus(modus)
+            {
+            
+                if (modus == "loop")
+                {
+                    applicationModus = "loop";
+                    
+                    // set to maximum window size + something extra. 
+                    var videosource = document.getElementById("videosource");
+                    videosource.width = (window.innerWidth * 1.5); 
+                    videosource.height = (window.innerHeight * 1.5); 
+                    
+                    // adjust the scrolling to somewhere in the middle
+                    scrollInit();
+                    loopcams();
+
+                    var noise =  document.getElementById("noise");
+                    noise.style.display = "inline";
+                }
+                
+                if (modus == "manual")
+                {
+                    playSwitchSound();
+                    applicationModus = "manual";
+                    
+                    // set to maximum window size
+                    var videosource = document.getElementById("videosource");
+                    videosource.width = window.innerWidth;
+                    videosource.height = window.innerHeight;
+                    
+                    var noise =  document.getElementById("noise");
+                    noise.style.display = "none";
+                }
+                
+                if (modus != "manual" && modus != "loop")
+                {
+                    alert("Invalid application modus.");
+                }
+            }
+            
+            function getApplicationModus()
+            {
+                return applicationModus;
+            }
+            
+            
+            // public, auto next-switching.
+            // changes current cam to the next one.
+            function switchCam()
+            {                
+                currentCam = getNextCamNumber();   
+                switchToCurrentCam();
+            }
+            
+            // manual cam switching using arrows
+            function showNextCam()
+            {
+                currentCam = getNextCamNumber(); 
+                setApplicationModus("manual");
+                switchToCurrentCam();
+            }
+            
+            function showPreviousCam()
+            {
+                currentCam = getPreviousCamNumber();
+                setApplicationModus("manual");
+                switchToCurrentCam();
+            
+            } // function
+            
+            // private
+            function getNextCamNumber()
+            {
+                tmpCam = currentCam; // can go over upper bound. Causes looping.
+                tmpCam++;
+                if (tmpCam == cams.length) 
+                {
+                    tmpCam = 0;
+                }
+                return tmpCam;
+            }
+            
+            // private
+            function getPreviousCamNumber()
+            {
+                tmpCam = currentCam; // can go over upper bound. Causes looping.
+                tmpCam--;
+                if (tmpCam < 0) 
+                {
+                    tmpCam = cams.length;
+                }
+                return tmpCam;
+            }
+            
+            
+            // default loop, when nothing happens.
+            // should be continious... waits a few seconds, while scrolling left and right, 
+            // then switches to the new cam, without sound.
+            var loopTimer = null; // store and remove timeout otherwise they'll make things look messy
+            // loop == cycle
+            function loopcams()
+            {
+                if (applicationModus == "loop")
+                {
+                    switchCam();
+                }
+                
+                if (loopTimer != null)
+                {
+                    clearTimeout(loopTimer);
+                }
+                
+                loopTimer = setTimeout('loopcams()',10000);
+                doScrollingLogic();
+            }
+            
+            function scrollInit(){
+                window.scrollBy(0,50);
+            }
+            
+            var scrollTimer = null; 
+            var scrollingDirection = "right"; //left or right.
+            function doScrollingLogic()
+            {
+                if (scrollingDirection == "right")
+                {
+                    window.scrollBy(1,0); // horizontal and vertical scroll increments
+                } 
+                
+                if (scrollingDirection == "left")
+                {
+                    window.scrollBy(-1,0); // horizontal and vertical scroll increments
+                }
+                
+                if (isScrolledToLeft())
+                {
+                    scrollingDirection = "right";
+                } 
+                
+                if (isScrolledToRight())
+                {
+                    scrollingDirection = "left";
+                }
+                
+                if (scrollTimer != null)
+                {
+                    clearTimeout(scrollTimer);
+                }
+                
+                scrollTimer = setTimeout('doScrollingLogic()',50); // scrolls every 100 milliseconds
+                    
+            }
+            
+            function isScrolledToLeft()
+            {
+                return window.pageXOffset == 0;
+            }
+            
+            // http://help.dottoro.com/ljiljfdp.php
+            function isScrolledToRight()
+            {
+                return window.pageXOffset >= (document.documentElement.scrollWidth - document.documentElement.clientWidth); 
+                // junk: document.body.scrollWidth; //window.scrollMaxX;
+            }
+            
+            
+            function showHide(elementId)
+            {
+                var thing = document.getElementById(elementId);
+                
+                // in safari: when display is set to none, it does not have a style in the dom tree. Therefore
+                // we force it a style when it doesn't have one. And since it's a toggle, we force it to show itself.
+                if (!thing.style.display)
+                {
+                    thing.style.display = "inline";
+                    return
+                }
+                
+                // normal boolean logic for toggling something 
+                if (thing.style.display == "none")
+                {
+                    thing.style.display = "inline";
+                } else {
+                    thing.style.display = "none";
+                }
+            }
+            
+            // show a cam by URL.
+            // changes the current Cam
+            function showCamByURL(cam)
+            {
+                setApplicationModus("manual");
+                
+                // to continue the correct flow: get the index of this cam, this becomes the current cam and switch to this cam.
+                
+                for (i=0;i<cams.length;i++)
+                {
+                    if (cam.src == cams[i]) 
+                    {
+                        currentCam = i;
+                    }
+                }
+                
+                // todo: refactor camswitch function.
+                /*
+                var videosource = document.getElementById("videosource");
+                videosource.src = cams[currentCam];
+                var information = document.getElementById("source");
+                information.innerText = "" + cams[currentCam]; */
+                
+                switchToCurrentCam();
+            }
+            
+            
+            // aka: switchToCurrentCam
+            function switchToCurrentCam()
+            {
+                if (currentCam < cams.length)
+                {
+                    var videosource = document.getElementById("videosource");
+                    videosource.src = cams[currentCam];
+                    var information = document.getElementById("source");
+                    information.innerText = "" + cams[currentCam]; 
+                }
+            }
+
+            // function not tuned for URL's with an ampersand.
+            function reloadImage()
+            {
+		    var image = document.getElementById("videosource");
+		    if (image.src.indexOf('cachebreak') == -1){
+                        if (image.src.indexOf('&') !== -1){
+		            image.src = image.src + "&cachebreak=" + new Date().getTime();
+		        } else {
+                             image.src = image.src + "?cachebreak=" + new Date().getTime(); 
+                        }
+                    }
+                    image.src = image.src.substring(0, image.src.indexOf("cachebreak=")) + "cachebreak=" + new Date().getTime();
+            }
+
+            /*
+                Cams are loaded dynamically depending on the array above.
+                Hopefully this makes sure that non-existing cams are written but do
+                not cause delay. Otherwise websocket to try it out?
+            */
+            function writeAllCamsToAllCams()
+            {
+                var allCamsList = document.getElementById("allcams");
+
+                while (allCamsList.childNodes.length > 1){
+                        allCamsList.lastChild.remove();
+                }
+
+                
+                for (i=0; i<cams.length; i++)
+                {
+                    newCam = document.createElement("img");
+                    //srcAttribute = document.createAttribute("src"); //http://192.168.142.244/mjpg/video.mjpg
+                    //widthAttribute = document.createAttribute("width"); // 240
+                    //heightAttribute = document.createAttribute("height"); // 160
+                    //onclickAttribute = document.createAttribute("onclick"); // showCamByURL(this)
+                    
+                    newCam.setAttribute("src", cams[i]);
+                    newCam.setAttribute("width", "240");
+                    newCam.setAttribute("height", "160");
+                    newCam.setAttribute("onclick", "showCamByURL(this)");
+                    
+                    allCamsList.appendChild(newCam);
+                } // for
+            } // function
+            
+        //    function clearAllCams()
+         //   {
+       //         var allCamsList = document.getElementById("allcams");
+       //         if (allCamsList){
+       //         while (allCamsList.childNodes.length > 1){
+       //                 allCamsList.lastChild.remove();
+       //         }
+       //         }
+       //     }
+
+            // changes the current Cam
+            function showCamDirectly(keyCode)
+            {
+                realKeyCode = keyCode - 48; // 0 = 48, 9 = 57
+                
+                if (realKeyCode <= cams.length && realKeyCode >= 0)
+                {
+                    currentCam = realKeyCode;
+                    setApplicationModus("manual");
+                    switchToCurrentCam();
+                }
+                
+            }
+            
+            
+        </script>
+        
+        <style>
+        
+            html
+            {
+                overflow: hidden;
+            }
+        
+            body {
+                padding: 0px;
+                margin: 0px;
+            }
+            
+            img {
+                border: 0px;
+            }
+            
+            #imagesource {
+                position: fixed;
+                left: 0px;
+                top: 0px;
+            }
+            
+            #debug {
+                position: fixed;
+                bottom: 0px;
+                right: 0px;
+                font-family: courier;
+                background-color:rgba(255,255,255,0.5);
+                padding: 20px;
+                display: none;
+            }
+            
+            #help 
+            {
+                position: fixed;
+                left: 100px;
+                top: 80px;
+                right: 100px;
+                background-color:rgba(255,255,255,0.5);
+                padding: 20px;
+                font-family: courier;
+                display: none;
+            }
+            
+            #allcams 
+            {
+                position: fixed;
+                bottom: 80px;
+                left: 100px;
+                right: 100px;
+                height: 180px;
+                overflow: auto;
+                text-align: center;
+                background-color:rgba(150,255,150,0.5);
+                display: none;
+            }
+
+            #allcams img
+            {
+                margin: 10px;
+            }
+
+            #noise {
+		display: visible;
+            }
+
+        </style>
+
+    </head>
+
+    <body onload="startCamApplication()" onKeyPress="return handleKeyboardInput(event)">
+
+        <div id="panel">
+            <img id="videosource" width="100%" height="100%" />
+        </div>
+
+
+        <div id="overlay">
+            <img id="imagesource" width="100%" height="100%" />
+        </div>
+
+        <div id="debug">
+            <span id="source">-</span>
+        </div>
+
+        <div id="help">
+            <h1>DN3D Security Monitoring System</h1>
+
+            <ul>
+                <li><b>Space</b>: show full view and cycle through cameras</li>
+                <li><b>H</b>: toggle help message</li>
+                <li><b>D</b>: debug modus</li>
+                <li><b>C</b>: show all cams, click a cam to view</li>
+                <li><b>0-9</b>: go to a cam directly</li>
+                <li>Default view is monitoring view.</li>
+            </ul>
+
+            <p>Thank you for choosing the Duke Nukem 3D Security Monitoring System.</p>
+
+            <p>By <a href="http://elgerjonker.nl">Elger "Stitch" Jonker</a> (and MrNoise Wilco) for the lolz.</p>
+        </div>
+        <canvas id="noise"></canvas>
+
+        <div id="allcams">
+
+        </div>
+
+    </body>
+</html>

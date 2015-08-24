@@ -1,0 +1,15 @@
+Todo:
+- dynamic loading of css per plugin
+- better handling of session timeouts
+- permissions from mysql workbench are NOT exported correctly. So you now have to give permissions manually (a lot of work to do correct)
+- fix: clicking a product on the frontpage (top X products), then the accountname, doesnt show the group where the product was in.
+- Tab completion
+- Add support for cash payments (a non-decreasing account or something like that, or better something designed to keep working)
+- Better support for error messages (everything failes silently now, even userland errors)
+- Add firefox support for layout.
+- Make escape key work in firefox.
+- sounds do not owrk in safari. a solution might be: http://matt-harrison.com/perfect-web-audio-on-ios-devices-with-the-web-audio-api/
+- disable web-controls when scrolling to top in safari. a solution might be: https://stackoverflow.com/questions/18793072/impossible-to-hide-navigation-bars-in-safari-ios-7-for-iphone-ipod-touch or https://mihhaillapushkin.wordpress.com/2014/01/20/stop-navigation-bars-from-appearing-in-iphone-ios7-safari/
+- make command input less trigger-happy on safari (everytime you touch an account it is activated, even if you want to scroll)
+- Design a system that would allow for hooks and prevent spagetti code such as the "instabuy" option hacked in user accounts.
+- Move to composer (or more popular system) to roll out dependencies

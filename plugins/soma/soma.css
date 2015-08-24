@@ -1,0 +1,34 @@
+#command_httpsomafmcomplayernowplayinggroovesalad {  background-image: url('images/groovesalad120.png');  }
+#command_httpsomafmcomplayernowplayinglush{  background-image: url('images/lush-x120.jpg');  }
+#command_httpsomafmcomplayernowplayingspacestation{  background-image: url('images/deepspaceone120.gif');  }
+#command_httpsomafmcomplayernowplayingdigitalis{  background-image: url('images/digitalis120.png');  }
+#command_httpsomafmcomplayernowplayingpoptron{  background-image: url('images/poptron120.png');  }
+#command_httpsomafmcomplayernowplayingindiepop{  background-image: url('images/indychick.jpg');  }
+#command_httpsomafmcomplayernowplayingbagel{  background-image: url('images/bagel120.png');  }
+#command_httpsomafmcomplayernowplaying7soul{  background-image: url('images/7soul120.png');  }
+#command_httpsomafmcomplayernowplayingdefcon{  background-image: url('images/defcon120.png');  }
+#command_httpsomafmcomplayernowplayingthetrip{  background-image: url('images/thetrip120.jpg');  }
+#command_httpsomafmcomplayernowplayingcliqhop{  background-image: url('images/cliqhop120.png');  }
+#command_httpsomafmcomplayernowplayingdubstep{  background-image: url('images/dubstep120.png');  }
+#command_httpsomafmcomplayernowplayingearwaves{  background-image: url('images/earwaves120.jpg');  }
+#command_httpsomafmcomplayernowplayingmissioncontrol{  background-image: url('images/missioncontrol120.jpg');  }
+#command_httpsomafmcomplayernowplayingsonicuniverse{  background-image: url('images/sonicuniverse120.jpg');  }
+#command_httpsomafmcomplayernowplayingsecretagent{  background-image: url('images/secretagent120.jpg');  }
+#command_httpsomafmcomplayernowplayingbootliquor{  background-image: url('images/bootliquor120.jpg');  }
+#command_httpsomafmcomplayernowplayingcovers{  background-image: url('images/covers120.jpg');  }
+#command_httpsomafmcomplayernowplayingu80s{  background-image: url('images/u80s-120.png');  }
+#command_httpsomafmcomplayernowplayingillstreet{  background-image: url('images/illstreet.jpg');  }
+#command_httpsomafmcomplayernowplayingdronezone{  background-image: url('images/dronezone120.jpg');  }
+#command_httpsomafmcomplayernowplayingdeepspaceone{  background-image: url('images/deepspaceone120.gif');  }
+#command_httpsomafmcomplayernowplayingsuburbsofgoa{  background-image: url('images/sog120.jpg');  }
+#command_httpsomafmcomplayernowplayingfolkfwd{  background-image: url('images/folkfwd120.jpg');  }
+#command_httpsomafmcomplayernowplayingbeatblender{  background-image: url('images/blender120.png');  }
+#command_httpsomafmcomplayernowplayingbrfm{  background-image: url('images/1023brc.jpg');  }
+#command_httpsomafmcomplayernowplayingsf1033{  background-image: url('images/sf1033120.png');  }
+#command_httpsomafmcomplayernowplayingdoomed{  background-image: url('images/doomed120.png');  }
+
+#command_soma {  background-image: url('somafm.jpg'); background-size: cover; color: transparent; }
+
+.radiostation{
+    color: transparent; width: 120px;  height: 120px;
+}

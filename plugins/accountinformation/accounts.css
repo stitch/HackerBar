@@ -1,0 +1,28 @@
+#account_stitch, #involvedaccount_stitch {
+    background-color: #2174B8 !important;
+    background-image: url('images/stitch.png');
+    background-repeat: no-repeat;
+    background-position: left;
+}
+
+#account_diggie, #involvedaccount_diggie {
+    background-image: url('images/diggie.png');
+    background-repeat: no-repeat;
+    background-position: left;
+    color: black;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: white;
+}
+
+#account_bugblue, #involvedaccount_bugblue {
+    background-image: url('images/bugblue2.png');
+    background-repeat: repeat;
+    background-position: left;
+    color: #E5E9EC;
+    -webkit-text-stroke-width: 1px;
+    font-weight: 100;
+    background-color: transparent;
+    font-size: 30px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
